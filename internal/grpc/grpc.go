@@ -374,18 +374,14 @@ func getTransportCredentials(agentConfig *config.Config) (credentials.TransportC
 		InsecureSkipVerify: agentConfig.Command.TLS.SkipVerify,
 	}
 
-	if agentConfig.Command.TLS.Key == "" {
-		return credentials.NewTLS(tlsConfig), nil
-	}
-
-	err := appendCertKeyPair(tlsConfig, agentConfig.Command.TLS.Cert, agentConfig.Command.TLS.Key)
-	if err != nil {
-		return nil, fmt.Errorf("append cert and key pair failed: %w", err)
-	}
-
-	err = appendRootCAs(tlsConfig, agentConfig.Command.TLS.Ca)
+	err := appendRootCAs(tlsConfig, agentConfig.Command.TLS.Ca)
 	if err != nil {
 		slog.Debug("Unable to append root CA", "error", err)
+	}
+
+	err = appendCertKeyPair(tlsConfig, agentConfig.Command.TLS.Cert, agentConfig.Command.TLS.Key)
+	if err != nil {
+		return nil, fmt.Errorf("append cert and key pair failed: %w", err)
 	}
 
 	return credentials.NewTLS(tlsConfig), nil
